@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "bobaquiz"
+version = "0.1.0"
+description = ""
+authors = ["neekrasov <neekrasov@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11"
+fastapi = "^0.86.0"
+sqlalchemy = {version = "2.0.0b3", extras = ["asyncio"]}
+asyncpg = "^0.27.0"
+alembic = "^1.8.1"
+pydantic = {extras = ["dotenv"], version = "^1.10.2"}
+gunicorn = "^20.1.0"
+flask-sqlalchemy = "^3.0.2"
+flask-admin = {git = "https://github.com/neekrasov/flask-admin.git"}
+psycopg2-binary = "^2.9.5"
+uvicorn = "^0.19.0"
+orjson = "^3.8.1"
+
+
+[tool.poetry.group.dev.dependencies]
+black = {version = "^22.10.0", allow-prereleases = true}
+mypy = "^0.991"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
