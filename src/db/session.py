@@ -1,6 +1,6 @@
 from typing import AsyncGenerator, Callable
 
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -25,7 +25,7 @@ def async_session(uri: str | None) -> Callable[..., AsyncGenerator[AsyncSession,
     return get_session
 
 
-def sync_session(uri: str | None) -> scoped_session:
+def sync_session(uri: str | None):
 
     if not uri:
         raise ValueError("No database URI provided")
@@ -33,4 +33,4 @@ def sync_session(uri: str | None) -> scoped_session:
     engine = create_engine(uri, future=True, echo=True)
     session_factory = sessionmaker(bind=engine, expire_on_commit=False, autoflush=False)  # type: ignore
 
-    return scoped_session(session_factory)
+    return session_factory

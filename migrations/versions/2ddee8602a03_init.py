@@ -25,6 +25,7 @@ def upgrade():
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('is_superuser', sa.Boolean(), nullable=False),
     sa.Column('is_staff', sa.Boolean(), nullable=False),
+    sa.Column('is_verified', sa.Boolean(), nullable=False),
     sa.Column('policy', sa.Boolean(), nullable=False),
     sa.Column('avatar', sa.String(), nullable=False),
     sa.Column('sub_id', sa.Enum('FREE', 'PREMIUM', name='subscriptionlevel'), nullable=False),

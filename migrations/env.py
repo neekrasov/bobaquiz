@@ -1,6 +1,4 @@
 import asyncio
-import pathlib
-import sys
 
 from logging.config import fileConfig
 from sqlalchemy import pool
@@ -9,13 +7,10 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-sys.path.append(str(pathlib.Path(__file__).resolve().parents[3]))
-
 from src.core.settings import get_settings
 from src.db.models.base import Base
 
-settings = get_settings(_env_file="../../.env")
-print(settings)
+settings = get_settings()
 config = context.config
 
 if config.config_file_name is not None:
@@ -47,7 +42,10 @@ def do_run_migrations(connection: Connection) -> None:
 
 async def run_migrations_online() -> None:
     configuration = config.get_section(config.config_ini_section)
-    configuration['sqlalchemy.url'] = settings.postgres_uri
+    if configuration is not None:
+        configuration["sqlalchemy.url"] = settings.postgres_uri
+    else:
+        raise ValueError("Configuration is None")
     connectable = async_engine_from_config(
             configuration,
             prefix="sqlalchemy.",

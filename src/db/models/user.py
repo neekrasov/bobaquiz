@@ -18,6 +18,7 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=True)
     is_superuser: Mapped[bool] = mapped_column(default=False)
     is_staff: Mapped[bool] = mapped_column(default=False)
+    is_verified: Mapped[bool] = mapped_column(default=False)
     policy: Mapped[bool] = mapped_column(default=True)
     avatar: Mapped[str] = mapped_column(default="")
     sub_id: Mapped[EnumType] = mapped_column(
@@ -37,3 +38,20 @@ class User(Base):
                 policy={self.policy},\
                 avatar={self.avatar},\
                 sub_id={self.sub_id})"
+    
+    @property
+    def is_authenticated(self):
+        return True
+
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
+    # Required for administrative interface
+    def __unicode__(self):
+        return self.username
+

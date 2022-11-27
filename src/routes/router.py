@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.api.v1.info import router as info_router
+from src.routes.v1.info import router as info_router
 
 router = APIRouter(prefix="/v1")
 

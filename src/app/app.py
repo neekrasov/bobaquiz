@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from src.core.settings import get_settings, Settings
-from src.api.router import router as api_router
-from src.db.stubs import get_session_stub
-from src.db.session import async_session
+from src.core.di.setup import setup_di
+from src.routes.router import router as api_router
+from src.routes.v1.auth import setup_auth
+
 
 def create_app(settings: Settings) -> FastAPI:
     app = FastAPI(
@@ -13,14 +14,15 @@ def create_app(settings: Settings) -> FastAPI:
         openapi_url="/api/openapi.json",
         default_response_class=ORJSONResponse,
     )
-    
+
+    setup_di(app)
+    setup_auth(app, api_router)
+
     app.include_router(
         router=api_router,
         prefix="/api",
     )
-    
-    app.dependency_overrides[get_session_stub] = async_session(settings.postgres_uri)
-    
+
     return app
 
 

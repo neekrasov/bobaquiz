@@ -1,32 +1,59 @@
-from flask import Flask
-from flask_admin import Admin, AdminIndexView
+from flask import Flask, g, render_template, redirect, url_for
 
-from src.core.settings import get_settings
+from flask_admin import Admin
+
+from src.admin.extensions import DatabaseMiddleware, init_login
+from src.admin.views.base import CustomBaseView
+from src.admin.views.admin import MyAdminIndexView
+from src.admin.utils import create_superuser_if_not_exists
+from src.core.settings import get_settings, Settings
 from src.db.models import Quiz, User, QuizResult
-from flask_admin.contrib.sqla import ModelView
-from src.admin.views.quiz import QuizView
-from src.db.session import sync_session
 
 
-def create_app(current_session) -> Flask:
-    app = Flask(__name__)
-    app.secret_key = get_settings().secret_key
+def create_app(settings: Settings) -> Flask:
+    # Initialize Flask app
+    app = Flask(__name__, template_folder="../admin/templates")
+    app.secret_key = settings.secret_key
+    
+    # Register middleware
+    if settings.postgres_uri is None:
+        raise ValueError("Postgres URI is not set")
+    
+    dbm = DatabaseMiddleware(settings.postgres_uri.replace("+asyncpg", ""))
+    dbm.register(app)
+    
+    # Initialize flask-admin
     admin = Admin(
         app=app, 
         name='Admin', 
-        index_view=AdminIndexView(name='📃', url='/'), 
-        template_mode='bootstrap4'
+        index_view=MyAdminIndexView(), 
+        base_template='my_master.html',
+        template_mode='bootstrap4',
     )
     
-    admin.add_view(QuizView(Quiz, current_session, name='Квиз'))
-    admin.add_view(ModelView(User, current_session, name='Пользователи'))
-    admin.add_view(ModelView(QuizResult, current_session, name='Результаты'))
+    with app.app_context():
+        if 'session' not in g:
+            dbm.open()
+        session = g.session
+        
+        # Setup Views
+        admin.add_view(CustomBaseView(Quiz, session, name='Квиз'))
+        admin.add_view(CustomBaseView(User, session, name='Пользователи'))
+        admin.add_view(CustomBaseView(QuizResult, session, name='Результаты'))
+        
+        # Create superuser
+        create_superuser_if_not_exists(session, settings)
+        
+        # Initialize flask-login
+        init_login(session, app)    
 
     return app
 
-if (uri := get_settings().postgres_uri) is not None:
-    global app
-    print('Starting admin app on uri:', uri)
-    app = create_app(sync_session(
-        uri.replace("+asyncpg", "")
-    ))
+
+settings = get_settings()
+app = create_app(settings)
+
+    
+@app.route('/')
+def index():
+    return redirect(url_for('admin.index'))

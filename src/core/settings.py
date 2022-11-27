@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     refresh_token_expire_minutes: int = 60 * 24 * 7
     secret_key: str = "secret"
     
+    superuser_name: str = "admin"
+    superuser_email: str = "admin@admin.com"
+    superuser_password: str = "admin"
+    
     @validator("postgres_uri", pre=True)
     def validate_postgres_conn(cls, v: str | None, values: dict[str, Any]) -> str:
         
