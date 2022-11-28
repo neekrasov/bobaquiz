@@ -15,7 +15,7 @@ class Quiz(Base):
     author_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
 
     author: Mapped["User"] = relationship("User", back_populates="quizzes")
-    results: Mapped["QuizResult"] = relationship("QuizResult", back_populates="quiz")
+    results: Mapped["QuizResult"] = relationship("QuizResult", back_populates="quiz", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Quiz(id={self.id},\

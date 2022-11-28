@@ -15,6 +15,7 @@ class MyAdminIndexView(AdminIndexView):
     @expose("/login/", methods=("GET", "POST"))
     def login_view(self):
         form = LoginForm(request.form)
+        
         if helpers.validate_form_on_submit(form):
             user = form.get_user()
             login.login_user(user)

@@ -24,9 +24,9 @@ class User(Base):
     sub_id: Mapped[EnumType] = mapped_column(
         EnumType(SubscriptionLevel), default=SubscriptionLevel.FREE
     )
-    
-    quizzes: Mapped["Quiz"] = relationship("Quiz", back_populates="author") #type: ignore
-    quiz_rezults: Mapped[list["QuizResult"]] = relationship("QuizResult", back_populates="user") #type: ignore
+
+    quizzes: Mapped["Quiz"] = relationship("Quiz", back_populates="author", cascade="all, delete-orphan")  # type: ignore
+    quiz_rezults: Mapped[list["QuizResult"]] = relationship("QuizResult", back_populates="user", cascade="all, delete-orphan")  # type: ignore
 
     def __repr__(self):
         return f"User(id={self.id},\
@@ -38,11 +38,10 @@ class User(Base):
                 policy={self.policy},\
                 avatar={self.avatar},\
                 sub_id={self.sub_id})"
-    
+
     @property
     def is_authenticated(self):
         return True
-
 
     @property
     def is_anonymous(self):
@@ -54,4 +53,3 @@ class User(Base):
     # Required for administrative interface
     def __unicode__(self):
         return self.username
-

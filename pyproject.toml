@@ -13,15 +13,14 @@ asyncpg = "^0.27.0"
 alembic = "^1.8.1"
 pydantic = {extras = ["dotenv"], version = "^1.10.2"}
 gunicorn = "^20.1.0"
-flask-sqlalchemy = "^3.0.2"
-flask-admin = {git = "https://github.com/neekrasov/flask-admin.git"}
 psycopg2-binary = "^2.9.5"
 uvicorn = "^0.19.0"
 orjson = "^3.8.1"
-fastapi-users = {extras = ["redis", "sqlalchemy"], version = "^10.2.1"}
+fastapi-users = {extras = ["oauth", "redis", "sqlalchemy"], version = "^10.2.1"}
 types-redis = "^4.3.21.5"
 flask-login = "^0.6.2"
 pyasn1 = "^0.4.8"
+flask-admin = {git = "https://github.com/neekrasov/flask-admin.git"}
 
 
 [tool.poetry.group.dev.dependencies]
