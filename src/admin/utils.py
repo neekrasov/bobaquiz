@@ -14,7 +14,6 @@ def create_superuser_if_not_exists(session: Session, settings: Settings):
     )
 
     if user:
-        print("Superuser already exists")
         return
 
     context = CryptContext(schemes=["bcrypt"], deprecated="auto")

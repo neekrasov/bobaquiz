@@ -3,6 +3,7 @@ import uuid
 from fastapi_users import schemas
 from src.db.models.user import SubscriptionLevel
 
+
 class UserRead(schemas.BaseUser[uuid.UUID]):
     username: str
     policy: bool

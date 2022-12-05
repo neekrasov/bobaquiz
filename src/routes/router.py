@@ -5,5 +5,5 @@ router = APIRouter(prefix="/v1")
 
 router.include_router(
     router=info_router,
-    tags=["info"],    
+    tags=["info"],
 )

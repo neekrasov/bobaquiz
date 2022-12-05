@@ -26,7 +26,19 @@ flask-admin = {git = "https://github.com/neekrasov/flask-admin.git"}
 [tool.poetry.group.dev.dependencies]
 black = {version = "^22.10.0", allow-prereleases = true}
 mypy = "^0.991"
+flake8 = "^6.0.0"
+flake8-pyproject = "^1.2.2"
+flake8-print = "^5.0.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+line-length = 79
+
+[tool.flake8]
+exclude = ['.git','__pycache__', '.env', 'venv']
+max-line-length = 79
+max-complexivity = 8

@@ -24,5 +24,7 @@ def setup_di(app: FastAPI):
     app.dependency_overrides[provide_session_stub] = provide_session()
 
     # Provide auth
-    app.dependency_overrides[provide_redis_strategy_stub] = provide_redis_strategy
+    app.dependency_overrides[
+        provide_redis_strategy_stub
+    ] = provide_redis_strategy
     app.dependency_overrides[provide_user_manager_stub] = provide_user_manager

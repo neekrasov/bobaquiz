@@ -1,2 +1,2 @@
-from .database import DatabaseMiddleware
-from .login import init_login
+from .database import DatabaseMiddleware # noqa
+from .login import init_login # noqa

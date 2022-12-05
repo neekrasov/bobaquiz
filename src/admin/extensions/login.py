@@ -1,6 +1,7 @@
 import flask_login as login
 from src.db.models import User
 
+
 # Initialize flask-login
 def init_login(session, app):
     login_manager = login.LoginManager()
@@ -10,5 +11,4 @@ def init_login(session, app):
     @login_manager.user_loader
     def load_user(user_id):
         user = session.query(User).filter_by(id=user_id).first()
-        print(user)
         return user

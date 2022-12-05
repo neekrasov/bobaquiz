@@ -8,7 +8,7 @@ class CustomBaseView(ModelView):
     can_delete = True
     can_view_details = True
 
-    column_sortable_list = ['created_at', 'updated_at']
-    
+    column_sortable_list = ["created_at", "updated_at"]
+
     def is_accessible(self):
         return login.current_user.is_authenticated

@@ -19,5 +19,7 @@ def provide_session():
     return context_session
 
 
-async def provide_user_db(session: AsyncSession = Depends(provide_session_stub)) -> AsyncGenerator[SQLAlchemyUserDatabase, None]:
+async def provide_user_db(
+    session: AsyncSession = Depends(provide_session_stub),
+) -> AsyncGenerator[SQLAlchemyUserDatabase, None]:
     yield SQLAlchemyUserDatabase(session, User)

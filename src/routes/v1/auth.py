@@ -1,10 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from fastapi_users import FastAPIUsers
-from fastapi_users.authentication import (
-    BearerTransport,
-    AuthenticationBackend,
-    BearerTransport,
-)
+from fastapi_users.authentication import BearerTransport, AuthenticationBackend
 
 from src.core.di.stubs import (
     provide_current_user_stub,
@@ -52,7 +48,8 @@ def setup_auth(app: FastAPI, router: APIRouter):
     )
 
     auth_app = FastAPIUsers(
-        get_user_manager=provide_user_manager_stub, auth_backends=[auth_backend]
+        get_user_manager=provide_user_manager_stub,
+        auth_backends=[auth_backend],
     )
 
     current_user = auth_app.current_user()

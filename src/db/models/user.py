@@ -1,7 +1,12 @@
+import typing
 from enum import Enum
 from .base import Base
+from .mixin import TimestampMixin
 from sqlalchemy import Enum as EnumType
 from sqlalchemy.orm import mapped_column, Mapped, relationship
+
+if typing.TYPE_CHECKING:
+    from .quiz import Quiz, QuizResult
 
 
 class SubscriptionLevel(Enum):
@@ -9,7 +14,7 @@ class SubscriptionLevel(Enum):
     PREMIUM = "premium"
 
 
-class User(Base):
+class User(Base, TimestampMixin):
     __tablename__ = "users"
 
     username: Mapped[str]
@@ -21,12 +26,16 @@ class User(Base):
     is_verified: Mapped[bool] = mapped_column(default=False)
     policy: Mapped[bool] = mapped_column(default=True)
     avatar: Mapped[str] = mapped_column(default="")
-    sub_id: Mapped[EnumType] = mapped_column(
+    subscription: Mapped[EnumType] = mapped_column(
         EnumType(SubscriptionLevel), default=SubscriptionLevel.FREE
     )
 
-    quizzes: Mapped["Quiz"] = relationship("Quiz", back_populates="author", cascade="all, delete-orphan")  # type: ignore
-    quiz_rezults: Mapped[list["QuizResult"]] = relationship("QuizResult", back_populates="user", cascade="all, delete-orphan")  # type: ignore
+    quizzes: Mapped["Quiz"] = relationship(
+        "Quiz", back_populates="author", cascade="all, delete-orphan"
+    )
+    quiz_rezults: Mapped[list["QuizResult"]] = relationship(
+        "QuizResult", back_populates="user", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"User(id={self.id},\
@@ -37,7 +46,7 @@ class User(Base):
                 is_staff={self.is_staff},\
                 policy={self.policy},\
                 avatar={self.avatar},\
-                sub_id={self.sub_id})"
+                subscription={self.subscription})"
 
     @property
     def is_authenticated(self):

@@ -1,26 +1,37 @@
+ifneq (,$(wildcard .env))
+    include .env
+    export
+endif
+
 run:
 	make -j 2 run-admin run-backend
 
 run-admin:
-	gunicorn src.app.admin:app --reload --bind 0.0.0.0:8001
+	poetry run gunicorn src.app.admin:app --reload --bind $(HOST):$(ADMIN_PORT)
 
 run-backend:
-	gunicorn src.app.app:app --reload --bind 0.0.0.0:8000 \
+	poetry run gunicorn src.app.app:app --reload --bind $(HOST):$(BACKEND_PORT) \
 	--worker-class uvicorn.workers.UvicornWorker \
-	--log-level debug \
+	--log-level ${LOG_LEVEL} \
 	--workers $(WORKERS)
 
 migrate-up:
-	alembic upgrade head;
+	poetry run alembic upgrade head
 
 migrate-down:
-	alembic downgrade $(revision);
+	poetry run alembic downgrade $(revision)
 
 migrate-create:
-	alembic revision --autogenerate -m $(name);
+	poetry run alembic revision --autogenerate -m $(name)
 
 migrate-history:
-	alembic history;
+	poetry run alembic history
 
 migrate-stamp:
-	alembic stamp -1;
+	poetry run alembic stamp $(revision)
+
+compose-build:
+	docker-compose -f docker/docker-compose.yml --env-file=.env build
+
+compose-up:
+	docker-compose -f docker/docker-compose.yml --env-file=.env up
