@@ -15,7 +15,7 @@ def provide_redis() -> Redis:
 
 
 def provide_session():
-    context_session = async_session(get_settings().postgres_uri)
+    context_session = async_session(get_settings().postgres_url)
     return context_session
 
 

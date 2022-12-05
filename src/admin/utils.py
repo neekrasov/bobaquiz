@@ -1,10 +1,13 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import scoped_session
 from passlib.context import CryptContext
 from src.core.settings import Settings
 from src.db.models import User
 
 
-def create_superuser_if_not_exists(session: Session, settings: Settings):
+def create_superuser_if_not_exists(
+    session: scoped_session,
+    settings: Settings
+):
     user = (
         session.query(User)
         .filter(

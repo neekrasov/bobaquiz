@@ -14,18 +14,15 @@ class Settings(BaseSettings):
     postgres_user: str = "postgres"
     postgres_password: str = "postgres"
     postgres_db: str = "postgres"
-    postgres_uri: str | None = None
+    postgres_url: str | None = None
 
-    algorithm: str = "HS256"
-    access_token_expire_minutes: int = 30
-    refresh_token_expire_minutes: int = 60 * 24 * 7
     secret_key: str = "secret"
 
     superuser_name: str = "admin"
     superuser_email: str = "admin@admin.com"
     superuser_password: str = "admin"
 
-    @validator("postgres_uri", pre=True)
+    @validator("postgres_url", pre=True)
     def validate_postgres_conn(
         cls, v: str | None, values: dict[str, Any]
     ) -> str:

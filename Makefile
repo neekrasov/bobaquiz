@@ -31,7 +31,19 @@ migrate-stamp:
 	poetry run alembic stamp $(revision)
 
 compose-build:
-	docker-compose -f docker/docker-compose.yml --env-file=.env build
+	docker-compose -f docker/docker-compose.yml --env-file .env build
 
 compose-up:
-	docker-compose -f docker/docker-compose.yml --env-file=.env up
+	docker-compose -f docker/docker-compose.yml --env-file .env up -d
+
+compose-logs:
+	docker-compose -f docker/docker-compose.yml --env-file .env logs -f
+
+compose-exec:
+	docker-compose -f docker/docker-compose.yml --env-file .env exec backend bash
+
+docker-rm-volume:
+	docker volume rm -f boba_db_data
+
+compose-down:
+	docker-compose -f docker/docker-compose.yml --env-file .env down --remove-orphans

@@ -1,6 +1,5 @@
 from typing import AsyncGenerator, Callable
-
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -11,13 +10,13 @@ from sqlalchemy.ext.asyncio import (
 
 
 def async_session(
-    uri: str | None,
+    url: str | None,
 ) -> Callable[..., AsyncGenerator[AsyncSession, None]]:
 
-    if not uri:
+    if not url:
         raise ValueError("No database URI provided")
 
-    engine: AsyncEngine = create_async_engine(uri, echo=True)
+    engine: AsyncEngine = create_async_engine(url, echo=True)
     session_factory: async_sessionmaker = async_sessionmaker(
         bind=engine, expire_on_commit=False)
 
@@ -28,14 +27,14 @@ def async_session(
     return get_session
 
 
-def sync_session(uri: str | None):
+def sync_session(url: str | None, scopefunc: Callable) -> scoped_session:
 
-    if not uri:
+    if not url:
         raise ValueError("No database URI provided")
 
-    engine = create_engine(uri, future=True, echo=True)
-    session_factory: sessionmaker = sessionmaker(
+    engine = create_engine(url, future=True, echo=True)
+    session_factory: scoped_session = scoped_session(sessionmaker(
         bind=engine, expire_on_commit=False, autoflush=False
-    )
+    ), scopefunc=scopefunc)
 
     return session_factory

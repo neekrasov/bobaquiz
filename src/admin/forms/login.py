@@ -1,17 +1,22 @@
-from flask import g
 from wtforms import form, fields, validators
 from src.db.models import User
 from passlib.exc import UnknownHashError
 from passlib.context import CryptContext
+from sqlalchemy.orm import scoped_session
 
 
 class LoginForm(form.Form):
+
+    def __init__(self, session: scoped_session, *args, **kwargs):
+        self.session = session
+        super(LoginForm, self).__init__(*args, **kwargs)
+
     login = fields.StringField()
     password = fields.PasswordField()
     passw_helper = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def validate_login(self, field):
-        user = self.get_user()
+        user = self.get_user(self.session)
 
         if user is None:
             raise validators.ValidationError("Invalid user")
@@ -36,7 +41,7 @@ class LoginForm(form.Form):
                 "You do not have permission to access the admin panel"
             )
 
-    def get_user(self):
+    def get_user(self, session):
         return (
-            g.session.query(User).filter_by(username=self.login.data).first()
+            session.query(User).filter_by(username=self.login.data).first()
         )

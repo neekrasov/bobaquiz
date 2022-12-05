@@ -1,52 +1,52 @@
-from flask import Flask, g, redirect, url_for
-
+from flask import Flask, redirect, url_for
+from threading import get_ident as _get_ident
 from flask_admin import Admin
-
-from src.admin.extensions import DatabaseMiddleware, init_login
+from src.admin.extensions import init_login
 from src.admin.views.base import CustomBaseView
 from src.admin.views.admin import MyAdminIndexView
 from src.admin.utils import create_superuser_if_not_exists
 from src.core.settings import get_settings, Settings
 from src.db.models import Quiz, User, QuizResult, Question
+from src.db.session import sync_session
 
 
 def create_app(settings: Settings) -> Flask:
+
     # Initialize Flask app
     app = Flask(__name__, template_folder="../admin/templates")
     app.secret_key = settings.secret_key
 
-    # Register middleware
-    if settings.postgres_uri is None:
+    # Initialize SQLAlchemy
+    if settings.postgres_url is None:
         raise ValueError("Postgres URI is not set")
 
-    dbm = DatabaseMiddleware(settings.postgres_uri.replace("+asyncpg", ""))
-    dbm.register(app)
+    Session = sync_session(
+        url=settings.postgres_url.replace("+asyncpg", ""),
+        scopefunc=_get_ident
+    )
 
-    # Initialize flask-admin
+    app.teardown_appcontext(lambda *args: Session.remove())
+
+    # Initialize flask-admin and login views
     admin = Admin(
         app=app,
         name="Admin",
-        index_view=MyAdminIndexView(),
+        index_view=MyAdminIndexView(Session),
         base_template="my_master.html",
         template_mode="bootstrap4",
     )
 
-    with app.app_context():
-        if "session" not in g:
-            dbm.open()
-        session = g.session
+    # Setup Views
+    admin.add_view(CustomBaseView(Quiz, Session, name="Квиз"))
+    admin.add_view(CustomBaseView(User, Session, name="Пользователи"))
+    admin.add_view(CustomBaseView(QuizResult, Session, name="Результаты"))
+    admin.add_view(CustomBaseView(Question, Session, name="Вопросы"))
 
-        # Setup Views
-        admin.add_view(CustomBaseView(Quiz, session, name="Квиз"))
-        admin.add_view(CustomBaseView(User, session, name="Пользователи"))
-        admin.add_view(CustomBaseView(QuizResult, session, name="Результаты"))
-        admin.add_view(CustomBaseView(Question, session, name="Вопросы"))
+    # Create superuser
+    create_superuser_if_not_exists(Session, settings)
 
-        # Create superuser
-        create_superuser_if_not_exists(session, settings)
-
-        # Initialize flask-login
-        init_login(session, app)
+    # Initialize flask-login
+    init_login(Session, app)
 
     return app
 
