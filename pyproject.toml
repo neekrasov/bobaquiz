@@ -22,6 +22,7 @@ flask-login = "^0.6.2"
 pyasn1 = "^0.4.8"
 flask-admin = {git = "https://github.com/neekrasov/flask-admin.git"}
 psycopg2 = "^2.9.5"
+gevent = "^22.10.2"
 
 
 [tool.poetry.group.dev.dependencies]

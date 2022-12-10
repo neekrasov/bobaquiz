@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: boba_db
+    image: postgres:14
+    volumes:
+      - boba_db_data:/var/lib/postgresql/data
+    ports:
+      - ${HOST_POSTGRES_PORT}:${POSTGRES_PORT}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+  
+  backend:
+    container_name: boba_backend
+    build: 
+      context: ..
+      dockerfile: deploy/Dockerfile
+    ports:
+      - ${HOST_BACKEND_PORT}:${BACKEND_PORT}
+      - ${HOST_ADMIN_PORT}:${ADMIN_PORT}
+    depends_on:
+      - db
+  
+  redis:
+    container_name: redis
+    image: redis:7
+    expose:
+      - 6379
+    depends_on:
+      - db
+
+volumes:
+  boba_db_data:
