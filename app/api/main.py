@@ -17,13 +17,13 @@ def create_app(settings: Settings) -> FastAPI:
         default_response_class=ORJSONResponse,
     )
 
-    async_session = create_async_session(settings.postgres_url)
+    session_factory = create_async_session(settings.postgres_url)
     redis = create_redis(settings.redis_url)
 
     di.setup(
         app=app,
         redis=redis,
-        session=async_session
+        session_factory=session_factory
     )
 
     setup_auth(

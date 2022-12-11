@@ -1,24 +1,14 @@
 import uuid
 import typing
-from enum import Enum
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import ForeignKey, Enum as EnumType, JSON
 
 from .base import Base, uuidpk
 from .mixin import TimestampMixin
+from ..enums.quiz import QuizType, QuestionType
 
 if typing.TYPE_CHECKING:
     from .user import User
-
-
-class QuizType(Enum):
-    SURVEY = "survey"
-    TEST = "test"
-
-
-class QuestionType(Enum):
-    SINGLE = "single"
-    MULTIPLE = "multiple"
 
 
 class Quiz(Base, TimestampMixin):

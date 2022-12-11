@@ -52,9 +52,6 @@ class Settings(BaseSettings):
             port=values.get("redis_port"),
         )
 
-    class Config:
-        env_file = ".env"
-
 
 @cache
 def get_settings(**kwargs):

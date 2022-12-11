@@ -1,3 +1,4 @@
+from typing import Callable
 from fastapi import FastAPI
 from redis.asyncio import Redis
 from .stubs import (
@@ -13,11 +14,11 @@ from .providers.auth import (
 )
 
 
-def setup(app: FastAPI, redis: Redis, session):
+def setup(app: FastAPI, redis: Redis, session_factory: Callable):
 
     # Provide db
     app.dependency_overrides[provide_redis_stub] = lambda: redis
-    app.dependency_overrides[provide_session_stub] = session
+    app.dependency_overrides[provide_session_stub] = session_factory
 
     # Provide auth
     app.dependency_overrides[

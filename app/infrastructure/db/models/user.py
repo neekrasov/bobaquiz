@@ -1,17 +1,13 @@
 import typing
-from enum import Enum
-from .base import Base
-from .mixin import TimestampMixin
 from sqlalchemy import Enum as EnumType
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
+from .base import Base
+from .mixin import TimestampMixin
+from ..enums.user import SubscriptionLevel
+
 if typing.TYPE_CHECKING:
     from .quiz import Quiz, QuizResult
-
-
-class SubscriptionLevel(Enum):
-    FREE = "free"
-    PREMIUM = "premium"
 
 
 class User(Base, TimestampMixin):

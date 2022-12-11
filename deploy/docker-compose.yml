@@ -23,6 +23,8 @@ services:
       - ${HOST_ADMIN_PORT}:${ADMIN_PORT}
     depends_on:
       - db
+    env_file:
+      - ${ENV_FILE}
   
   redis:
     container_name: redis
