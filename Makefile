@@ -13,10 +13,10 @@ run:
 	make -j 2 run-admin run-backend
 
 run-admin:
-	poetry run gunicorn app.admin.main:app --reload --bind $(HOST):$(ADMIN_PORT)
+	poetry run gunicorn app.interfaces.admin.main:app --reload --bind $(HOST):$(ADMIN_PORT)
 
 run-backend:
-	poetry run gunicorn app.api.main:app --reload --bind $(HOST):$(BACKEND_PORT) \
+	poetry run gunicorn app.interfaces.api.main:app --reload --bind $(HOST):$(BACKEND_PORT) \
 	--worker-class uvicorn.workers.UvicornWorker \
 	--log-level ${LOG_LEVEL} \
 	--workers $(WORKERS)

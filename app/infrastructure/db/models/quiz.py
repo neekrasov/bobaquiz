@@ -3,9 +3,10 @@ import typing
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import ForeignKey, Enum as EnumType, JSON
 
+from app.core.quiz.entity import QuizType, QuestionType
+
 from .base import Base, uuidpk
 from .mixin import TimestampMixin
-from ..enums.quiz import QuizType, QuestionType
 
 if typing.TYPE_CHECKING:
     from .user import User
@@ -24,7 +25,7 @@ class Quiz(Base, TimestampMixin):
 
     author: Mapped["User"] = relationship("User", back_populates="quizzes")
     questions: Mapped[list["Question"]] = relationship(
-        "Question", back_populates="quiz", cascade="all, delete-orphan"
+        "Question", cascade="all, delete-orphan"
     )
     results: Mapped[list["QuizResult"]] = relationship(
         "QuizResult", back_populates="quiz", cascade="all, delete-orphan"
@@ -72,16 +73,13 @@ class Question(Base, TimestampMixin):
     __tablename__ = "question"
 
     quiz_id: Mapped[uuidpk] = mapped_column(ForeignKey("quiz.id"))
+    name: Mapped[str]
     img: Mapped[str | None] = mapped_column()
     file: Mapped[str | None] = mapped_column()
     type: Mapped[EnumType] = mapped_column(
         EnumType(QuestionType), default=QuestionType.SINGLE
     )
-
-    question: Mapped[str] = mapped_column(JSON, nullable=True)
-    solution: Mapped[str] = mapped_column(JSON, nullable=True)
-
-    quiz = relationship("Quiz", back_populates="questions")
+    options = relationship("AnsOption")
 
     def __repr__(self):
         return f"Question(id={self.id},\
@@ -90,4 +88,23 @@ class Question(Base, TimestampMixin):
                 solution={self.solution})"
 
     def __str__(self) -> str:
-        return f"Question in {self.quiz.name}."
+        return f"Question in {self.name}."
+
+
+class AnsOption(Base, TimestampMixin):
+    __tablename__ = "ans_option"
+
+    question_id: Mapped[uuidpk] = mapped_column(ForeignKey("question.id"))
+    name: Mapped[str]
+    img: Mapped[str | None] = mapped_column()
+    file: Mapped[str | None] = mapped_column()
+    is_correct: Mapped[bool] = mapped_column()
+
+    def __repr__(self):
+        return f"AnsOption(id={self.id},\
+                question_id={self.question_id},\
+                name={self.name},\
+                is_correct={self.is_correct})"
+
+    def __str__(self) -> str:
+        return f"Answer option for {self.name}."

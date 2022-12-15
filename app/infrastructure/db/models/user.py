@@ -2,9 +2,9 @@ import typing
 from sqlalchemy import Enum as EnumType
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
+from app.core.user.entity.enum import SubscriptionLevel
 from .base import Base
 from .mixin import TimestampMixin
-from ..enums.user import SubscriptionLevel
 
 if typing.TYPE_CHECKING:
     from .quiz import Quiz, QuizResult

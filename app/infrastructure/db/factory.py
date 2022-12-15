@@ -49,4 +49,4 @@ def create_redis(url: str | None) -> Redis:
     if not url:
         raise ValueError("No redis URI provided")
 
-    return Redis.from_url(url)
+    return Redis.from_url(url, decode_responses=True)
