@@ -26,3 +26,9 @@ def provide_user_manager_stub():
 
 def provide_mediator_stub():
     raise NotImplementedError("provide_mediator_stub() is not implemented")
+
+
+def provide_read_quiz_service_stub():
+    raise NotImplementedError(
+        "provide_read_quiz_service_stub() is not implemented"
+    )

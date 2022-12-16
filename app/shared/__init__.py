@@ -5,3 +5,4 @@ from .entity import Entity # noqa
 from .event_emitter import EventEmitter, Listener # noqa
 from .event_handler import EventHandler, Event # noqa
 from .dto import DTO # noqa
+from .exception import BaseAppException # noqa

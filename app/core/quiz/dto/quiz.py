@@ -1,10 +1,10 @@
 from app.shared import DTO
 from app.core.quiz.entity import QuizType
-from .question import QuestionCreate
+from .question import Question
 
 
-class QuizCreate(DTO):
+class Quiz(DTO):
     name: str
     img: str | None
     type: QuizType
-    questions: list[QuestionCreate] | None
+    questions: list[Question] | None

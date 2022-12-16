@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 0d062271949e
+Revision ID: 2947a2d7093c
 Revises: 
-Create Date: 2022-12-12 14:58:53.706106
+Create Date: 2022-12-15 22:01:20.894903
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0d062271949e'
+revision = '2947a2d7093c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -57,7 +57,7 @@ def upgrade():
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=False),
-    sa.ForeignKeyConstraint(['quiz_id'], ['quiz.id'], ),
+    sa.ForeignKeyConstraint(['quiz_id'], ['quiz.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('quiz_id', 'id'),
     sa.UniqueConstraint('id'),
     sa.UniqueConstraint('quiz_id')
@@ -71,7 +71,7 @@ def upgrade():
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=False),
-    sa.ForeignKeyConstraint(['question_id'], ['question.id'], ),
+    sa.ForeignKeyConstraint(['question_id'], ['question.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('question_id', 'id'),
     sa.UniqueConstraint('id'),
     sa.UniqueConstraint('question_id')
@@ -84,9 +84,9 @@ def upgrade():
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=False),
-    sa.ForeignKeyConstraint(['question_id'], ['question.id'], ),
-    sa.ForeignKeyConstraint(['quiz_id'], ['quiz.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['question_id'], ['question.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['quiz_id'], ['quiz.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('quiz_id', 'user_id', 'question_id', 'id'),
     sa.UniqueConstraint('id'),
     sa.UniqueConstraint('question_id'),

@@ -28,7 +28,7 @@ class Quiz(Base, TimestampMixin):
         "Question", cascade="all, delete-orphan"
     )
     results: Mapped[list["QuizResult"]] = relationship(
-        "QuizResult", back_populates="quiz", cascade="all, delete-orphan"
+        "QuizResult", back_populates="quiz", cascade="all, delete"
     )
 
     def __repr__(self):
@@ -45,12 +45,14 @@ class Quiz(Base, TimestampMixin):
 class QuizResult(Base, TimestampMixin):
     __tablename__ = "quiz_result"
 
-    quiz_id: Mapped[uuidpk] = mapped_column(ForeignKey("quiz.id"), unique=True)
+    quiz_id: Mapped[uuidpk] = mapped_column(
+        ForeignKey("quiz.id", ondelete="CASCADE"), unique=True
+    )
     user_id: Mapped[uuidpk] = mapped_column(
-        ForeignKey("users.id"), unique=True
+        ForeignKey("users.id", ondelete="CASCADE"), unique=True
     )
     question_id: Mapped[uuidpk] = mapped_column(
-        ForeignKey("question.id"), unique=True
+        ForeignKey("question.id", ondelete="CASCADE"), unique=True
     )
 
     solution: Mapped[str | None] = mapped_column(JSON)
@@ -72,14 +74,17 @@ class QuizResult(Base, TimestampMixin):
 class Question(Base, TimestampMixin):
     __tablename__ = "question"
 
-    quiz_id: Mapped[uuidpk] = mapped_column(ForeignKey("quiz.id"))
+    quiz_id: Mapped[uuidpk] = mapped_column(
+        ForeignKey("quiz.id", ondelete="CASCADE")
+    )
     name: Mapped[str]
     img: Mapped[str | None] = mapped_column()
     file: Mapped[str | None] = mapped_column()
     type: Mapped[EnumType] = mapped_column(
         EnumType(QuestionType), default=QuestionType.SINGLE
     )
-    options = relationship("AnsOption")
+    options = relationship(
+        "AnsOption", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Question(id={self.id},\
@@ -94,7 +99,9 @@ class Question(Base, TimestampMixin):
 class AnsOption(Base, TimestampMixin):
     __tablename__ = "ans_option"
 
-    question_id: Mapped[uuidpk] = mapped_column(ForeignKey("question.id"))
+    question_id: Mapped[uuidpk] = mapped_column(
+        ForeignKey("question.id", ondelete="CASCADE")
+    )
     name: Mapped[str]
     img: Mapped[str | None] = mapped_column()
     file: Mapped[str | None] = mapped_column()

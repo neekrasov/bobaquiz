@@ -1,7 +1,7 @@
 from app.shared import DTO
 
 
-class AnsOptionCreate(DTO):
+class AnsOption(DTO):
     name: str
     img: str | None
     file: str | None
