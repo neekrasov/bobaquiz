@@ -8,6 +8,7 @@ from .stubs import (
     provide_user_manager_stub,
     provide_mediator_stub,
     provide_read_quiz_service_stub,
+    provide_quiz_solution_service_stub,
 )
 
 from .providers.auth import (
@@ -16,7 +17,10 @@ from .providers.auth import (
 )
 
 from .providers.mediator import provide_mediator
-from .providers.services import provide_read_quiz_service
+from .providers.services import (
+    provide_read_quiz_service,
+    provide_quiz_solution_service,
+)
 
 
 def setup(app: FastAPI, redis: Redis, session_factory: Callable):
@@ -38,3 +42,7 @@ def setup(app: FastAPI, redis: Redis, session_factory: Callable):
     app.dependency_overrides[
         provide_read_quiz_service_stub
     ] = provide_read_quiz_service
+
+    app.dependency_overrides[
+        provide_quiz_solution_service_stub
+    ] = provide_quiz_solution_service

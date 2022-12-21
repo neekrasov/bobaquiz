@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
 from app.infrastructure.db.factory import create_async_session, create_redis
-from app.infrastructure.db.mapping import start_mapper
+from app.infrastructure.db.models import mapping
 from app.settings import get_settings, Settings
 from .routes.router import router as api_router
 from .routes.v1.auth import setup_auth
@@ -37,7 +37,7 @@ def create_app(settings: Settings) -> FastAPI:
         prefix="/api",
     )
 
-    start_mapper()
+    mapping.start_mapper()
 
     return app
 

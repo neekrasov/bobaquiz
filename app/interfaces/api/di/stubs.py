@@ -32,3 +32,9 @@ def provide_read_quiz_service_stub():
     raise NotImplementedError(
         "provide_read_quiz_service_stub() is not implemented"
     )
+
+
+def provide_quiz_solution_service_stub():
+    raise NotImplementedError(
+        "provide_quiz_solution_service_stub() is not implemented"
+    )

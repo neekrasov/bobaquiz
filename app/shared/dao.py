@@ -10,3 +10,7 @@ class DAO(Protocol):
 
     async def flush(self) -> None:
         ...
+
+
+class DAOReader(Protocol):
+    ...

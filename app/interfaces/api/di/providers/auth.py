@@ -3,7 +3,7 @@ from fastapi import Depends
 from redis.asyncio import Redis
 from fastapi_users.authentication import RedisStrategy
 
-from ....api.schemas.users import UserManager
+from ....api.routes.request_models.user import UserManager
 from ....api.di.stubs import provide_redis_stub
 from ....api.di.providers.db import provide_user_db
 

@@ -1,11 +1,13 @@
-from typing import AsyncGenerator, Callable, Type
+from typing import AsyncGenerator, Callable, Type, TypeVar
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_users.db import SQLAlchemyUserDatabase
 
-from app.infrastructure.db.dao.base import BaseDAO
+from app.infrastructure.db.dao.base import BaseDAO, BaseDAOReader
 from app.infrastructure.db.models.user import User
 from ...di.stubs import provide_session_stub
+
+DAO = TypeVar("DAO", BaseDAO, BaseDAOReader)
 
 
 async def provide_user_db(
@@ -15,11 +17,11 @@ async def provide_user_db(
 
 
 def get_dao(
-    dao_type: Type[BaseDAO],
-) -> Callable[[AsyncSession], BaseDAO]:
+    dao_type: Type[DAO],
+) -> Callable[[AsyncSession], DAO]:
     def _get_dao(
         session: AsyncSession = Depends(provide_session_stub),
-    ) -> BaseDAO:
+    ) -> DAO:
         return dao_type(session=session)
 
     return _get_dao

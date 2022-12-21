@@ -3,11 +3,11 @@ from sqlalchemy import Enum as EnumType
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from app.core.user.entity.enum import SubscriptionLevel
-from .base import Base
-from .mixin import TimestampMixin
+from ..base import Base
+from ..mixin import TimestampMixin
 
 if typing.TYPE_CHECKING:
-    from .quiz import Quiz, QuizResult
+    from .quiz import Quiz
 
 
 class User(Base, TimestampMixin):
@@ -28,9 +28,6 @@ class User(Base, TimestampMixin):
 
     quizzes: Mapped["Quiz"] = relationship(
         "Quiz", back_populates="author", cascade="all, delete-orphan"
-    )
-    quiz_rezults: Mapped[list["QuizResult"]] = relationship(
-        "QuizResult", back_populates="user", cascade="all, delete-orphan"
     )
 
     def __repr__(self):

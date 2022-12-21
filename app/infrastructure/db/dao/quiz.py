@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import select, delete
 from sqlalchemy.engine import Result
 
-from app.infrastructure.db.dao.base import BaseDAO
+from app.infrastructure.db.dao.base import BaseDAO, BaseDAOReader
 from app.core.quiz.protocols.dao import QuizDAO, QuizDAOReader
 from app.core.quiz.entity import (
     QuizEntity,
@@ -18,6 +18,7 @@ class QuizDAOImpl(QuizDAO, BaseDAO):
         self._session = session
 
     async def add_quiz(self, quiz: QuizEntity) -> QuizEntity:
+        quiz.created_at = QuizEntity.generate_timestamp()
         self._session.add(quiz)
         return quiz
 
@@ -37,7 +38,7 @@ class QuizDAOImpl(QuizDAO, BaseDAO):
         await self._session.commit()
 
 
-class QuizDAOReaderImpl(QuizDAOReader, BaseDAO):
+class QuizDAOReaderImpl(QuizDAOReader, BaseDAOReader):
     def __init__(self, session: AsyncSession):
         self._session = session
 

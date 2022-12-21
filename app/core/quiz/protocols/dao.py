@@ -1,6 +1,6 @@
 from typing import Protocol, Sequence
 from uuid import UUID
-from app.shared.dao import DAO
+from app.shared.dao import DAO, DAOReader
 
 from app.core.quiz.entity.quiz import QuizEntity
 from app.core.quiz import dto
@@ -19,7 +19,7 @@ class QuizDAO(DAO, Protocol):
         ...
 
 
-class QuizDAOReader(DAO, Protocol):
+class QuizDAOReader(DAOReader, Protocol):
     async def get_quiz_by_id(self, quiz_id: UUID) -> QuizEntity | None:
         ...
 

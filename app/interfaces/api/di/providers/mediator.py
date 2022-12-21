@@ -20,18 +20,29 @@ from app.core.quiz.usecases.delete_quiz.handlers import (
     DeleteQuizCommandHandler,
 )
 
+from app.core.quiz.usecases.answer_quiz import (
+    QuizSolutionValidatedEvent,
+    ValidateQuizSolutionCommand,
+    ValidateQuizSolutionCommandHandler,
+)
+
+from app.core.solution.usecase.create_solution import (
+    QuizSolutionValidatedEventHandler
+)
+from app.infrastructure.db.dao.solution import QuizSolutionDAOImpl
+
 
 def provide_mediator(
     quiz_dao=Depends(get_dao(QuizDAOImpl)),
     quiz_dao_reader=Depends(get_dao(QuizDAOReaderImpl)),
+    quiz_solution_dao=Depends(get_dao(QuizSolutionDAOImpl)),
 ):
     mediator = MediatorImpl()
 
     mediator.bind_command(
         command_type=CreateQuizCommand,
         handler_type=lambda mediator: CreateQuizCommandHandler(
-            mediator=mediator,
-            quiz_dao=quiz_dao
+            mediator=mediator, quiz_dao=quiz_dao
         ),
     )
 
@@ -53,4 +64,19 @@ def provide_mediator(
         ),
     )
 
+    mediator.bind_command(
+        command_type=ValidateQuizSolutionCommand,
+        handler_type=lambda mediator: ValidateQuizSolutionCommandHandler(
+            mediator=mediator,
+            quiz_dao_reader=quiz_dao_reader,
+        ),
+    )
+
+    mediator.bind_event(
+        event_type=QuizSolutionValidatedEvent,
+        handler_type=lambda mediator: QuizSolutionValidatedEventHandler(
+            mediator=mediator,
+            quiz_solution_dao=quiz_solution_dao,
+        )
+    )
     return mediator

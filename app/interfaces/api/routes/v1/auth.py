@@ -2,7 +2,7 @@ from fastapi import FastAPI, APIRouter
 from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import BearerTransport, AuthenticationBackend
 
-from ...schemas.users import UserCreate, UserRead, UserUpdate
+from ...routes.request_models.user import UserCreate, UserRead, UserUpdate
 from ...di.stubs import (
     provide_current_user_stub,
     provide_redis_strategy_stub,

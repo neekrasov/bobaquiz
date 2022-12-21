@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.shared import DAO
+from app.shared import DAO, DAOReader
 
 
 class BaseDAO(DAO):
@@ -14,3 +14,8 @@ class BaseDAO(DAO):
 
     async def flush(self) -> None:
         await self._session.flush()
+
+
+class BaseDAOReader(DAOReader):
+    def __init__(self, session: AsyncSession):
+        self._session = session

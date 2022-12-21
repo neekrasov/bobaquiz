@@ -2,7 +2,7 @@ from flask import Flask, redirect, url_for
 from threading import get_ident as _get_ident
 from flask_admin import Admin
 
-from app.infrastructure.db.models import Quiz, User, QuizResult, Question
+from app.infrastructure.db.models import Quiz, User, Question
 from app.infrastructure.db.factory import create_sync_session
 
 from ..admin.extensions import init_login
@@ -40,7 +40,6 @@ def create_app(settings: Settings) -> Flask:
     # Setup Views
     admin.add_view(CustomBaseView(Quiz, Session, name="Квиз"))
     admin.add_view(CustomBaseView(User, Session, name="Пользователи"))
-    admin.add_view(CustomBaseView(QuizResult, Session, name="Результаты"))
     admin.add_view(CustomBaseView(Question, Session, name="Вопросы"))
 
     # Create superuser

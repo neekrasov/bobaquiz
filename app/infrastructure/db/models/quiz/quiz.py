@@ -1,12 +1,26 @@
 import uuid
 import typing
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import ForeignKey, Enum as EnumType, JSON
+from sqlalchemy.orm import (
+    mapped_column,
+    Mapped,
+    relationship,
+    registry,
+)
+from sqlalchemy import (
+    Enum as EnumType,
+    ForeignKey,
+    UUID,
+)
 
-from app.core.quiz.entity import QuizType, QuestionType
-
-from .base import Base, uuidpk
-from .mixin import TimestampMixin
+from app.core.quiz.entity import (
+    QuizType,
+    QuestionType,
+    QuestionEntity,
+    AnsOptionEntity,
+    QuizEntity,
+)
+from ..base import Base
+from ..mixin import TimestampMixin
 
 if typing.TYPE_CHECKING:
     from .user import User
@@ -14,8 +28,6 @@ if typing.TYPE_CHECKING:
 
 class Quiz(Base, TimestampMixin):
     __tablename__ = "quiz"
-
-    id: Mapped[uuidpk]
     name: Mapped[str]
     img: Mapped[str | None] = mapped_column()
     author_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
@@ -26,9 +38,6 @@ class Quiz(Base, TimestampMixin):
     author: Mapped["User"] = relationship("User", back_populates="quizzes")
     questions: Mapped[list["Question"]] = relationship(
         "Question", cascade="all, delete-orphan"
-    )
-    results: Mapped[list["QuizResult"]] = relationship(
-        "QuizResult", back_populates="quiz", cascade="all, delete"
     )
 
     def __repr__(self):
@@ -42,39 +51,10 @@ class Quiz(Base, TimestampMixin):
                 {len(self.questions)} questions. Type: {self.type.name}"
 
 
-class QuizResult(Base, TimestampMixin):
-    __tablename__ = "quiz_result"
-
-    quiz_id: Mapped[uuidpk] = mapped_column(
-        ForeignKey("quiz.id", ondelete="CASCADE"), unique=True
-    )
-    user_id: Mapped[uuidpk] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), unique=True
-    )
-    question_id: Mapped[uuidpk] = mapped_column(
-        ForeignKey("question.id", ondelete="CASCADE"), unique=True
-    )
-
-    solution: Mapped[str | None] = mapped_column(JSON)
-
-    quiz: Mapped["Quiz"] = relationship("Quiz", back_populates="results")
-    user: Mapped["User"] = relationship("User", back_populates="quiz_rezults")
-
-    def __repr__(self):
-        return f"QuizResult(id={self.id},\
-                quiz_id={self.quiz_id},\
-                user_id={self.user_id},\
-                question_id={self.question_id},\
-                solution={self.solution})"
-
-    def __str__(self) -> str:
-        return f"Quiz result for {self.user.username} in {self.quiz.name}."
-
-
 class Question(Base, TimestampMixin):
     __tablename__ = "question"
 
-    quiz_id: Mapped[uuidpk] = mapped_column(
+    quiz_id: Mapped[UUID] = mapped_column(
         ForeignKey("quiz.id", ondelete="CASCADE")
     )
     name: Mapped[str]
@@ -83,8 +63,8 @@ class Question(Base, TimestampMixin):
     type: Mapped[EnumType] = mapped_column(
         EnumType(QuestionType), default=QuestionType.SINGLE
     )
-    options = relationship(
-        "AnsOption", cascade="all, delete-orphan")
+    correct_count: Mapped[int] = mapped_column(default=0)
+    options = relationship("AnsOption", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Question(id={self.id},\
@@ -99,7 +79,7 @@ class Question(Base, TimestampMixin):
 class AnsOption(Base, TimestampMixin):
     __tablename__ = "ans_option"
 
-    question_id: Mapped[uuidpk] = mapped_column(
+    question_id: Mapped[UUID] = mapped_column(
         ForeignKey("question.id", ondelete="CASCADE")
     )
     name: Mapped[str]
@@ -115,3 +95,32 @@ class AnsOption(Base, TimestampMixin):
 
     def __str__(self) -> str:
         return f"Answer option for {self.name}."
+
+
+def map_quiz_tables(mapper_registry: registry):
+    quiz_table = Quiz.__table__
+    question_table = Question.__table__
+    ans_option_table = AnsOption.__table__
+
+    mapper_registry.map_imperatively(
+        QuizEntity,
+        quiz_table,
+        properties={
+            "questions": relationship(
+                QuestionEntity,
+                cascade="all, delete-orphan",
+            ),
+        },
+    )
+    mapper_registry.map_imperatively(
+        QuestionEntity,
+        question_table,
+        properties={
+            "options": relationship(
+                AnsOptionEntity,
+                cascade="all, delete-orphan",
+                lazy="selectin",
+            )
+        },
+    )
+    mapper_registry.map_imperatively(AnsOptionEntity, ans_option_table)
