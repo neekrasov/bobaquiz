@@ -48,7 +48,6 @@ class QuizSolutionValidatedEventHandler(EventHandler):
                 user_id=event.user_id,
                 grade=quiz_solution.grade,
                 questions=questions,
-                created_at=None,
             )
         )
         await self._quiz_solution_dao.commit()

@@ -1,5 +1,5 @@
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 
@@ -14,7 +14,7 @@ class Entity:
 
 @dataclass
 class CreatedTimeStampMixin:
-    created_at: datetime | None
+    created_at: datetime = field(init=False)
 
     @classmethod
     def generate_timestamp(cls) -> datetime:

@@ -4,7 +4,7 @@ from app.core.quiz.entity import (
     QuizEntity,
     QuestionEntity,
     AnsOptionEntity,
-    QuestionType,
+    QuestionType as QT,
 )
 from .commands import CreateQuizCommand
 
@@ -24,47 +24,38 @@ class CreateQuizCommandHandler(CommandHandler):
         quiz_in_db = QuizEntity(
             id=quiz_id,
             author_id=command.author_id,
-            created_at=None,
             **quiz.dict(exclude={"questions"})
         )
 
-        if quiz.questions is None:
-            await self._quiz_dao.commit()
-            return
+        if quiz.questions is not None:
+            for question in quiz.questions:
+                question_id = QuestionEntity.generate_id()
+                if question.options is not None:
+                    correct_count = 0
+                    if question.type == QT.SINGLE:
+                        correct_count = 1
 
-        for question in quiz.questions:
-            question_id = QuestionEntity.generate_id()
-            if question.options is None:
-                await self._quiz_dao.commit()
-                return
+                    question_options = []
+                    for option in question.options:
+                        if option.is_correct and question.type == QT.MULTIPLE:
+                            correct_count += 1
 
-            correct_count = 0
-            if question.type == QuestionType.SINGLE:
-                correct_count = 1
+                        option_in_db = AnsOptionEntity(
+                            id=AnsOptionEntity.generate_id(),
+                            question_id=question_id,
+                            **option.dict()
+                        )
+                        question_options.append(option_in_db)
 
-            question_options = []
-            for option in question.options:
-                if all(
-                    (option.is_correct, question.type == QuestionType.MULTIPLE)
-                ):
-                    correct_count += 1
-
-                option_in_db = AnsOptionEntity(
-                    id=AnsOptionEntity.generate_id(),
-                    question_id=question_id,
-                    **option.dict()
-                )
-                question_options.append(option_in_db)
-
-            quiz_in_db.questions.append(
-                QuestionEntity(
-                    id=question_id,
-                    quiz_id=quiz_id,
-                    correct_count=correct_count,
-                    options=question_options,
-                    **question.dict(exclude={"options"})
-                )
-            )
+                    quiz_in_db.questions.append(
+                        QuestionEntity(
+                            id=question_id,
+                            quiz_id=quiz_id,
+                            correct_count=correct_count,
+                            options=question_options,
+                            **question.dict(exclude={"options"})
+                        )
+                    )
 
         await self._quiz_dao.add_quiz(quiz_in_db)
         await self._quiz_dao.commit()
