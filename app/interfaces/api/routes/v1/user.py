@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.shared import Mediator
@@ -5,18 +6,26 @@ from app.core.user.entities.user import UserEntity
 from app.core.user.usecases.auth import AuthUserService
 from app.core.user.usecases.create_user import CreateUserCommand
 from app.core.user.dto import PairTokens
-from app.core.user.exceptions.user import UserAlreadyExists
+from app.core.user.exceptions.user import (
+    UserAlreadyExists,
+    UserIsNotAuthorQuiz,
+)
 from app.core.user.exceptions.auth import (
     IncorrectUserCredentials,
     TokenDecodeError,
 )
+from app.core.user.usecases.read_users import UserReaderService
 from ..request_models.user import UserSignUpRequest, UserLoginFormRequest
-from ..response_models.user import UserReadResponse
+from ..response_models.user import (
+    UserReadResponse,
+    UsersWithCountResponse,
+)
 from ...di.providers.auth import get_login_form
 from ...di.stubs import (
     provide_auth_service_stub,
     provide_current_user_stub,
     provide_mediator_stub,
+    provide_user_reader_service_stub,
 )
 
 
@@ -129,6 +138,31 @@ async def get_me(
             detail="could not validate credentials",
         )
 
-    user_dict = user.dict()
-    user_dict.update({"subscription": user.subscription.type})
-    return user_dict
+    return user
+
+
+@router.get(
+    "/completed-quiz/{quiz_id}",
+    summary="Get users completed quiz",
+    response_model=UsersWithCountResponse,
+)
+async def get_users_completed_quiz(
+    quiz_id: UUID,
+    user_service: UserReaderService = Depends(
+        provide_user_reader_service_stub
+    ),
+    user: UserEntity = Depends(provide_current_user_stub),
+):
+    try:
+        users = await user_service.get_users_completed_quiz(quiz_id, user)
+    except UserIsNotAuthorQuiz as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=e.args[0],
+        )
+    if not users:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="no users found",
+        )
+    return {"users": users, "count": len(users)}

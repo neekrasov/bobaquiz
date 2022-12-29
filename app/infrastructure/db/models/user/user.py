@@ -14,9 +14,13 @@ from app.core.user.entities.user import (
     SubscriptionLevelEnum,
     UserEntity,
     SubscriptionLevelEntity,
+    QuizSolutionEntityID,
+    QuizID,
 )
 from ..base import Base
 from ..mixin import TimestampMixin
+from ..solution import QuizSolution
+from ..quiz import Quiz
 
 
 class User(Base, TimestampMixin):
@@ -87,6 +91,8 @@ class SubscriptionLevel(Base):
 def map_user_tables(mapper_registry: registry):
     user_table = User.__table__
     subscription_level_table = SubscriptionLevel.__table__
+    quiz_solution_table = QuizSolution.__table__
+    quiz_table = Quiz.__table__
 
     mapper_registry.map_imperatively(
         UserEntity,
@@ -102,4 +108,10 @@ def map_user_tables(mapper_registry: registry):
     )
     mapper_registry.map_imperatively(
         SubscriptionLevelEntity, subscription_level_table
+    )
+    mapper_registry.map_imperatively(
+        QuizSolutionEntityID, quiz_solution_table
+    )
+    mapper_registry.map_imperatively(
+        QuizID, quiz_table
     )

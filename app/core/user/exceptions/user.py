@@ -11,3 +11,7 @@ class UserDoesNotExist(UserException):
 
 class UserAlreadyExists(UserException):
     """User already exists exception"""
+
+
+class UserIsNotAuthorQuiz(UserException):
+    """User don't have permission exception"""

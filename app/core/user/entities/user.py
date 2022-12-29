@@ -5,11 +5,20 @@ from dataclasses import dataclass
 from datetime import datetime
 from app.shared import Entity, CreatedTimeStampMixin
 
-UserID = NewType("UserID", uuid.UUID)
 RawPassword = NewType("RawPassword", str)
 HashedPassword = NewType("HashedPassword", str)
 Username = NewType("Username", str)
 Email = NewType("Email", str)
+
+
+class QuizID(Entity):
+    id: uuid.UUID
+    author_id: uuid.UUID
+
+
+class QuizSolutionEntityID(Entity):
+    quiz_id: uuid.UUID
+    user_id: uuid.UUID
 
 
 class SubscriptionLevelEnum(Enum):
