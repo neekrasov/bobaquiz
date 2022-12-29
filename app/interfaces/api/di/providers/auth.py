@@ -1,20 +1,46 @@
-from typing import AsyncGenerator
 from fastapi import Depends
-from redis.asyncio import Redis
-from fastapi_users.authentication import RedisStrategy
 
-from ....api.routes.request_models.user import UserManager
-from ....api.di.stubs import provide_redis_stub
-from ....api.di.providers.db import provide_user_db
+from fastapi import HTTPException, status
+from fastapi.security import (
+    OAuth2PasswordBearer,
+    OAuth2PasswordRequestForm,
+)
+
+from app.core.user.usecases.auth import AuthUserService
+from app.core.user.entities.user import (
+    RawPassword,
+    UserEntity,
+    Username,
+)
+from app.core.user.exceptions.auth import (
+    TokenDecodeError,
+)
+from ...routes.request_models.user import UserLoginFormRequest
+from ....api.di.stubs import provide_auth_service_stub
+
+oauth2_schema = OAuth2PasswordBearer(
+    tokenUrl="/api/v1/users/login",
+)
 
 
-def provide_redis_strategy(
-    redis: Redis = Depends(provide_redis_stub),
-) -> RedisStrategy:
-    return RedisStrategy(redis, lifetime_seconds=3600)
+async def get_current_user(
+    token: str = Depends(oauth2_schema),
+    auth_service: AuthUserService = Depends(provide_auth_service_stub),
+) -> UserEntity | None:
+    try:
+        user = await auth_service.find_user_by_access_token(token=token)
+    except TokenDecodeError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="could not validate credentials",
+        )
+    return user
 
 
-async def provide_user_manager(
-    user_db=Depends(provide_user_db),
-) -> AsyncGenerator[UserManager, None]:
-    yield UserManager(user_db)
+def get_login_form(
+    user: OAuth2PasswordRequestForm = Depends(),
+) -> UserLoginFormRequest:
+    return UserLoginFormRequest(
+        username=Username(user.username),
+        password=RawPassword(user.password),
+    )

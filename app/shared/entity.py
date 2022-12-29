@@ -1,5 +1,5 @@
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from datetime import datetime
 
 
@@ -10,6 +10,9 @@ class Entity:
     @classmethod
     def generate_id(cls) -> uuid.UUID:
         return uuid.uuid4()
+
+    def dict(self) -> dict:
+        return asdict(self)
 
 
 @dataclass

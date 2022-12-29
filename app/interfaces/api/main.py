@@ -5,7 +5,6 @@ from app.infrastructure.db.factory import create_async_session, create_redis
 from app.infrastructure.db.models import mapping
 from app.settings import get_settings, Settings
 from .routes.router import router as api_router
-from .routes.v1.auth import setup_auth
 from . import di
 
 
@@ -25,11 +24,6 @@ def create_app(settings: Settings) -> FastAPI:
         app=app,
         redis=redis,
         session_factory=session_factory
-    )
-
-    setup_auth(
-        app=app,
-        router=api_router
     )
 
     app.include_router(

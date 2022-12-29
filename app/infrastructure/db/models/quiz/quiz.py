@@ -1,5 +1,4 @@
 import uuid
-import typing
 from sqlalchemy.orm import (
     mapped_column,
     Mapped,
@@ -22,9 +21,6 @@ from app.core.quiz.entity import (
 from ..base import Base
 from ..mixin import TimestampMixin
 
-if typing.TYPE_CHECKING:
-    from .user import User
-
 
 class Quiz(Base, TimestampMixin):
     __tablename__ = "quiz"
@@ -35,7 +31,6 @@ class Quiz(Base, TimestampMixin):
         EnumType(QuizType), default=QuizType.TEST
     )
 
-    author: Mapped["User"] = relationship("User", back_populates="quizzes")
     questions: Mapped[list["Question"]] = relationship(
         "Question", cascade="all, delete-orphan"
     )
@@ -47,7 +42,7 @@ class Quiz(Base, TimestampMixin):
                 author_id={self.author_id})"
 
     def __str__(self) -> str:
-        return f"{self.name} by {self.author.username}. \
+        return f"{self.name}. \
                 {len(self.questions)} questions. Type: {self.type.name}"
 
 
